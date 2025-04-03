@@ -1,8 +1,7 @@
 import request from "supertest";
 import { it, expect, describe, beforeAll, afterAll } from "vitest";
 import prisma from "../prisma-client";
-import app from "../index";
-
+import app from "../app";
 describe("POST /tasks", () => {
   beforeAll(async () => {
     // connect to db before test
@@ -15,7 +14,7 @@ describe("POST /tasks", () => {
   });
   it("should add a task", async () => {
     const response = await request(app)
-      .post("/tasks")
+      .post("/api/tasks")
       .send({
         title: "Test Task",
         description: "This is a test task",
@@ -30,7 +29,7 @@ describe("POST /tasks", () => {
 
   it("should return 400 for invalid data", async () => {
     const response = await request(app)
-      .post("/tasks")
+      .post("/api/tasks")
       .send({
         title: "",
         description: "This is another test task",
@@ -59,7 +58,7 @@ describe("GET /tasks", () => {
     await prisma.$disconnect();
   });
   it("should return all tasks", async () => {
-    const response = await request(app).get("/tasks");
+    const response = await request(app).get("/api/tasks");
 
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBeTruthy();
@@ -67,7 +66,7 @@ describe("GET /tasks", () => {
   });
 
   it("should return a task if given a valid id", async () => {
-    const response = await request(app).get(`/tasks/${testTask.id}`);
+    const response = await request(app).get(`/api/tasks/${testTask.id}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
@@ -75,7 +74,7 @@ describe("GET /tasks", () => {
   });
 
   it("should return 404 if task does not exist", async () => {
-    const response = await request(app).get(`/tasks/999999`);
+    const response = await request(app).get(`/api/tasks/999999`);
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("message", "Task not found");
@@ -108,7 +107,7 @@ describe("PATCH /task/:id", () => {
     };
 
     const response = await request(app)
-      .patch(`/tasks/${testTask.id}`)
+      .patch(`/api/tasks/${testTask.id}`)
       .send(updatedData);
 
     expect(response.status).toBe(200);
@@ -124,7 +123,7 @@ describe("PATCH /task/:id", () => {
     };
 
     const response = await request(app)
-      .patch(`/tasks/${testTask.id}`)
+      .patch(`/api/tasks/${testTask.id}`)
       .send(updatedStatus);
 
     expect(response.status).toBe(200);
@@ -148,7 +147,7 @@ describe("PATCH /task/:id", () => {
     };
 
     const response = await request(app)
-      .patch(`/tasks/${testTask.id}`)
+      .patch(`/api/tasks/${testTask.id}`)
       .send(invalidData);
 
     expect(response.status).toBe(400);
@@ -156,7 +155,7 @@ describe("PATCH /task/:id", () => {
   });
 
   it("should return 404 if task is not found", async () => {
-    const response = await request(app).patch("/tasks/99999").send({
+    const response = await request(app).patch("/api/tasks/99999").send({
       title: "Non-existent Task",
     });
 
@@ -186,7 +185,7 @@ describe("DELETE /tasks/:id", () => {
   });
 
   it("should delete a task and return 204 No Content", async () => {
-    const response = await request(app).delete(`/tasks/${testTask.id}`);
+    const response = await request(app).delete(`/api/tasks/${testTask.id}`);
 
     expect(response.status).toBe(204);
 
@@ -200,7 +199,7 @@ describe("DELETE /tasks/:id", () => {
   it("should return 404 if task does not exist", async () => {
     const nonExistentTaskId = 9999; // A random ID that doesn't exist
 
-    const response = await request(app).delete(`/tasks/${nonExistentTaskId}`);
+    const response = await request(app).delete(`/api/tasks/${nonExistentTaskId}`);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ message: "Task not found" });
