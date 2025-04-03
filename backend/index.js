@@ -81,6 +81,19 @@ app.patch("/tasks/:id", async (req, res) => {
   res.send(updatedTask);
 });
 
+// delete task
+app.delete("/tasks/:id", async (req, res) => {
+  const id = req.params.id;
+  const task = await prisma.task.findUnique({
+    where: { id: parseInt(id) },
+  });
+  if (!task) return res.status(404).send({ message: "Task not found" });
+  const deletedTask = await prisma.task.delete({
+    where: { id: parseInt(id) },
+  });
+  res.status(204).send(deletedTask);
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () =>
   console.log(`ToDo app up and running on port ${port}...`)
