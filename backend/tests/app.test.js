@@ -156,13 +156,13 @@ describe("PATCH /task/:id", ()=>{
      expect(response.body.message).toBeDefined();
    });
 
-  //  it("should return 404 if task is not found", async () => {
-  //    const response = await request(app).patch("/tasks/99999").send({
-  //      title: "Non-existent Task",
-  //    });
+   it("should return 404 if task is not found", async () => {
+     const response = await request(app).patch("/tasks/99999").send({
+       title: "Non-existent Task",
+     });
 
-  //    expect(response.status).toBe(404);
-  //    expect(response.body.message).toMatch(/not found/i)
-  //   //  .toBe("Task not found");
-  //  });
+     expect(response.status).toBe(404);
+     expect(response.body.message).toMatch(/not found/i)
+    //  .toBe("Task not found");
+   });
 })
