@@ -44,7 +44,7 @@ import app from "../index";
 // });
 
 describe("GET /tasks", () => {
-    let testTask;
+  let testTask;
   beforeAll(async () => {
     testTask = await prisma.task.create({
       data: {
@@ -59,10 +59,25 @@ describe("GET /tasks", () => {
     await prisma.$disconnect();
   });
   it("should return all tasks", async () => {
-    const response = (await request(app).get("/tasks"));
+    const response = await request(app).get("/tasks");
 
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBeTruthy();
-    expect(response.body.length).toBeGreaterThan(0)
+    expect(response.body.length).toBeGreaterThan(0);
+  });
+
+  it("should return a task if given a valid id", async () => {
+    const response = await request(app).get(`/tasks/${testTask.id}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("title");
+  });
+
+  it("should return 404 if task does not exist", async () => {
+    const response = await request(app).get(`/tasks/999999`);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty("message", "Task not found");
   });
 });
